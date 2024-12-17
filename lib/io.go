@@ -64,3 +64,50 @@ func (pq *PriorityQueue[T]) Pop() any {
 	*pq = old[0 : n-1]
 	return item
 }
+
+// identical to the above but sorts in ascending order
+type PriorityQueueAsc[T any] []*PQItem[T]
+
+func (pq PriorityQueueAsc[T]) Len() int { return len(pq) }
+
+func (pq PriorityQueueAsc[T]) Less(i, j int) bool {
+	return pq[i].Priority < pq[j].Priority
+}
+
+func (pq PriorityQueueAsc[T]) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].Index = i
+	pq[j].Index = j
+}
+
+func (pq *PriorityQueueAsc[T]) Push(x any) {
+	n := len(*pq)
+	item := x.(*PQItem[T])
+	item.Index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueueAsc[T]) Pop() any {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // don't stop the GC from reclaiming the item eventually
+	item.Index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
+}
+
+func PowInt(x, y int) int {
+	if y == 0 {
+		return 1
+	}
+	if y == 1 {
+		return x
+	}
+	result := x
+	for i := 1; i < y; i++ {
+		result *= x
+	}
+
+	return result
+}
